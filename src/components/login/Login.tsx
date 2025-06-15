@@ -16,26 +16,32 @@ function Login() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/login", {
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const response = await fetch("http://localhost:7000/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: email, password }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        console.log("Success:", data);
+      if (response.ok && data.success) {
+        console.log("Login successful:", data);
         localStorage.setItem("token", data.token);
-        navigate("/");
+        localStorage.setItem("userId", data.userId);
+        navigate("/"); // Go to dashboard/home
       } else {
-        alert(data.message || "Registration failed");
+        alert(data.message || "Login failed");
       }
     } catch (error) {
       console.error("Error:", error);
       alert("Error connecting to server");
     }
   };
+
   return (
     <Box
       sx={{

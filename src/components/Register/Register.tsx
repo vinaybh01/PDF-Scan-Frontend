@@ -16,20 +16,23 @@ function Register() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/signup", {
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const response = await fetch("http://localhost:7000/signup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: email, password }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
       });
 
-      const data = await response.json();
+      const text = await response.text();
 
-      if (response.ok) {
-        console.log("Success:", data);
-        localStorage.setItem("token", data.token);
-        navigate("/");
+      if (response.ok && text.includes("User created")) {
+        alert("Signup successful! Please log in.");
+        navigate("/login"); // redirect to login
       } else {
-        alert(data.message || "Registration failed");
+        alert(text || "Registration failed");
       }
     } catch (error) {
       console.error("Error:", error);

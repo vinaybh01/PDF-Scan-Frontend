@@ -10,6 +10,7 @@ function UploadFile() {
   const [scanned, setScanned] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [sanitizedFileUrl, setSanitizedFileUrl] = useState<string | null>(null);
+  const [scanMessage, setScanMessage] = React.useState<string | null>(null);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
   const isLoggedIn = localStorage.getItem("token") !== null;
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ function UploadFile() {
     }
   };
 
-  const handleScan = async () => {
+  const handleScan = async (): Promise<void> => {
     if (!file) {
       alert("Please upload a PDF file first.");
       return;
@@ -58,28 +59,43 @@ function UploadFile() {
     setLoading(true);
     setScanned(false);
     setSanitizedFileUrl(null);
+    setScanMessage(null); // reset message before scanning
 
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("http://localhost:3000/sanitize-pdf", {
+      const response = await fetch("http://localhost:7000/sanitize", {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Failed to scan file");
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to scan file");
       }
 
-      const blob = await response.blob();
+      const contentType = response.headers.get("Content-Type") || "";
 
-      const url = window.URL.createObjectURL(blob);
-      setSanitizedFileUrl(url);
-      setScanned(true);
-    } catch (error) {
-      console.log(error);
-      alert("Something went wrong while scanning the file.");
+      if (contentType.includes("application/pdf")) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        setSanitizedFileUrl(url);
+        setScanned(true);
+        setScanMessage(null); // no message needed, file ready to download
+      } else {
+        // Backend sent plain text message (e.g., clean or suspicious)
+        const text = await response.text();
+        setScanMessage(text);
+        setScanned(true); // consider scan done but no sanitized file
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+        setScanMessage("Something went wrong: " + error.message);
+      } else {
+        setScanMessage("Something went wrong while scanning the file.");
+      }
     } finally {
       setLoading(false);
     }
@@ -273,7 +289,7 @@ function UploadFile() {
               </Button>
             )}
           </Box>
-          {file && !loading && !sanitizedFileUrl && (
+          {file && !loading && !sanitizedFileUrl &&(
             <Typography
               sx={{
                 mt: 4,
@@ -285,6 +301,22 @@ function UploadFile() {
               "{file.name}" Uploaded ({(file.size / 1024 / 1024).toFixed(2)} MB)
             </Typography>
           )}
+          {/* Show message only if it exists */}
+          {scanMessage && file && (
+            <Typography
+              sx={{
+                mt: 4,
+                fontSize: "20px",
+                textAlign: "center",
+                color: scanMessage.toLowerCase().includes("error")
+                  ? "red"
+                  : "#4CAF50",
+              }}
+            >
+              {scanMessage}
+            </Typography>
+          )}
+
           {file && !loading && sanitizedFileUrl && (
             <Typography
               sx={{
