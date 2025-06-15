@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #444;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #444;
+  border-radius: 10px;
+}
+
+/* src/global.css */
+.custom-gradient-background {
+  background: linear-gradient(
+    360deg,
+    rgba(62, 62, 62, 0.7) -75.44%,
+    rgba(13, 13, 13, 0.7) 76.32%
+  );
+}
+
+.custom-box-shadow {
+  box-shadow: 0px -3.34px 28.14px 0px rgba(155, 155, 155, 0.16) inset;
+}
+
+.custom-button {
+  background-color: #4264f2; /* Adjust the background color as needed */
+  color: white; /* Text color */
+  border: none; /* Remove default border */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0px 4px 44.6px 0px rgba(66, 84, 242, 0.58); /* Drop shadow */
+  font-family: "Outfit", sans-serif; /* Custom font */
+  font-size: 16px; /* Adjust the font size */
+  text-transform: none; /* Prevent text transformation */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.custom-button:hover {
+  /* Optional: Add hover effects */
+}
+/* src/global.css */
+.custom-dotted-border {
+  display: flex;
+  border: 1px dotted #4254f2;
+  margin: 20px 40px 20px 0px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Increase the gap between elements if needed */
+  padding: 10px;
+  position: relative; /* To position the star image */
+  width: 100%; /* Ensure the container is wide enough */
+  max-width: 800px; /* Adjust as needed */
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: #07090d;
+}
